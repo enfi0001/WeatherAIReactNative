@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Button,
   FlatList,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,16 +10,48 @@ import {
   View,
 } from 'react-native';
 
+function PrimaryButton({ title, onPress }) {
+  return (
+    <Pressable style={styles.primaryButton} onPress={onPress}>
+      <Text style={styles.primaryButtonText}>{title}</Text>
+    </Pressable>
+  );
+}
+
+function SmallButton({ title, onPress, danger }) {
+  return (
+    <Pressable
+      style={[styles.smallButton, danger && styles.dangerButton]}
+      onPress={onPress}
+    >
+      <Text style={[styles.smallButtonText, danger && styles.dangerButtonText]}>
+        {title}
+      </Text>
+    </Pressable>
+  );
+}
+
+function WeatherMetric({ label, value }) {
+  return (
+    <View style={styles.metricBox}>
+      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={styles.metricLabel}>{label}</Text>
+    </View>
+  );
+}
+
 function CityWeatherCard({ cityName, country, weather }) {
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>
-        {cityName}, {country}
-      </Text>
+    <View style={styles.weatherCard}>
+      <Text style={styles.cityName}>{cityName}</Text>
+      <Text style={styles.countryName}>{country}</Text>
 
-      <Text style={styles.weatherText}>Temperatur: {weather.temperature}°C</Text>
-      <Text style={styles.weatherText}>Vind: {weather.windSpeed} km/t</Text>
-      <Text style={styles.weatherText}>Regn: {weather.rain} mm</Text>
+      <Text style={styles.bigTemperature}>{weather.temperature}°</Text>
+
+      <View style={styles.metricsRow}>
+        <WeatherMetric label="Vind" value={`${weather.windSpeed} km/t`} />
+        <WeatherMetric label="Regn" value={`${weather.rain} mm`} />
+      </View>
     </View>
   );
 }
@@ -39,7 +71,14 @@ function CityAnalysis({ weather }) {
         data={analysis}
         keyExtractor={(item, index) => index.toString()}
         scrollEnabled={false}
-        renderItem={({ item }) => <Text style={styles.listItem}>• {item}</Text>}
+        renderItem={({ item, index }) => (
+          <View style={styles.analysisItem}>
+            <View style={styles.analysisDot}>
+              <Text style={styles.analysisDotText}>{index + 1}</Text>
+            </View>
+            <Text style={styles.listItem}>{item}</Text>
+          </View>
+        )}
       />
     </View>
   );
@@ -54,13 +93,8 @@ function FavoriteCityItem({ city, onSelectCity, onRemoveCity }) {
       </View>
 
       <View style={styles.favoriteButtons}>
-        <View style={styles.smallButton}>
-          <Button title="Vis" onPress={() => onSelectCity(city)} />
-        </View>
-
-        <View style={styles.smallButton}>
-          <Button title="Fjern" color="#b00020" onPress={() => onRemoveCity(city.id)} />
-        </View>
+        <SmallButton title="Vis" onPress={() => onSelectCity(city)} />
+        <SmallButton title="Fjern" danger onPress={() => onRemoveCity(city.id)} />
       </View>
     </View>
   );
@@ -200,11 +234,7 @@ export default function CitySearchScreen() {
       return;
     }
 
-    setFavoriteCities((previousCities) => [
-      ...previousCities,
-      selectedCity,
-    ]);
-
+    setFavoriteCities((previousCities) => [...previousCities, selectedCity]);
     setErrorMessage('');
   }
 
@@ -221,16 +251,17 @@ export default function CitySearchScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Søg by</Text>
+      <Text style={styles.subtitle}>Find vejret i en valgfri by</Text>
 
       <View style={styles.card}>
         <TextInput
           style={styles.input}
-          placeholder="Skriv fx Copenhagen, Aarhus eller London"
+          placeholder="Copenhagen, Aarhus, London..."
           value={cityInput}
           onChangeText={setCityInput}
         />
 
-        <Button title="Hent vejr" onPress={searchCityWeather} />
+        <PrimaryButton title="Hent vejr" onPress={searchCityWeather} />
       </View>
 
       {loading && (
@@ -254,9 +285,7 @@ export default function CitySearchScreen() {
             weather={cityWeather}
           />
 
-          <View style={styles.buttonSpacing}>
-            <Button title="Tilføj til favoritter" onPress={addFavoriteCity} />
-          </View>
+          <PrimaryButton title="Tilføj til favoritter" onPress={addFavoriteCity} />
 
           <CityAnalysis weather={cityWeather} />
         </>
@@ -289,47 +318,127 @@ export default function CitySearchScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingTop: 30,
+    paddingTop: 28,
     backgroundColor: '#eef6fb',
   },
   title: {
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontSize: 34,
+    fontWeight: '800',
     color: '#123047',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#5f7482',
+    marginTop: 4,
     marginBottom: 20,
   },
   card: {
     backgroundColor: 'white',
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 20,
     marginBottom: 18,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 3,
   },
+  weatherCard: {
+    backgroundColor: '#123047',
+    padding: 22,
+    borderRadius: 24,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  cityName: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: '800',
+  },
+  countryName: {
+    color: '#b8d8e8',
+    fontSize: 15,
+    marginTop: 2,
+  },
+  bigTemperature: {
+    color: 'white',
+    fontSize: 68,
+    fontWeight: '800',
+    marginTop: 14,
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  metricBox: {
+    flex: 1,
+    backgroundColor: '#1d4664',
+    padding: 14,
+    borderRadius: 16,
+  },
+  metricValue: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  metricLabel: {
+    color: '#b8d8e8',
+    marginTop: 4,
+  },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
+    fontSize: 21,
+    fontWeight: '800',
+    marginBottom: 14,
     color: '#123047',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccd7df',
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 14,
+    padding: 14,
     marginBottom: 12,
     backgroundColor: '#f8fbfd',
+    fontSize: 15,
   },
-  weatherText: {
+  primaryButton: {
+    backgroundColor: '#1f7a9c',
+    paddingVertical: 15,
+    paddingHorizontal: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  primaryButtonText: {
+    color: 'white',
     fontSize: 16,
-    marginBottom: 6,
+    fontWeight: '700',
+  },
+  analysisItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  analysisDot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#d7ebff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  analysisDotText: {
+    color: '#123047',
+    fontWeight: '800',
   },
   listItem: {
+    flex: 1,
     fontSize: 15,
-    marginBottom: 8,
     lineHeight: 21,
+    color: '#253946',
   },
   loadingBox: {
     alignItems: 'center',
@@ -343,30 +452,27 @@ const styles = StyleSheet.create({
   errorBox: {
     backgroundColor: '#ffe3e3',
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: 18,
   },
   errorText: {
     color: '#8a0000',
     fontSize: 15,
   },
-  buttonSpacing: {
-    marginBottom: 18,
-  },
   favoriteItem: {
     borderWidth: 1,
     borderColor: '#dde7ee',
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 16,
+    padding: 14,
     marginBottom: 10,
     backgroundColor: '#f8fbfd',
   },
   favoriteTextContainer: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   favoriteName: {
-    fontSize: 17,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '800',
     color: '#123047',
   },
   favoriteCountry: {
@@ -376,11 +482,24 @@ const styles = StyleSheet.create({
   },
   favoriteButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 10,
   },
   smallButton: {
     flex: 1,
-    marginRight: 8,
+    backgroundColor: '#eef6fb',
+    paddingVertical: 11,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  smallButtonText: {
+    color: '#123047',
+    fontWeight: '700',
+  },
+  dangerButton: {
+    backgroundColor: '#ffe3e3',
+  },
+  dangerButtonText: {
+    color: '#b00020',
   },
   emptyText: {
     fontSize: 15,

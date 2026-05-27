@@ -40,36 +40,46 @@ export default function MapScreen({ route }) {
     <View style={styles.container}>
       <Text style={styles.title}>Vejrkort</Text>
 
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: startLocation.latitude,
-          longitude: startLocation.longitude,
-          latitudeDelta: 2.5,
-          longitudeDelta: 2.5,
-        }}
-      >
-        {location && (
-          <Marker
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            title="Din lokation"
-          />
-        )}
+      <View style={styles.mapCard}>
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: startLocation.latitude,
+            longitude: startLocation.longitude,
+            latitudeDelta: 2.5,
+            longitudeDelta: 2.5,
+          }}
+        >
+          {location && (
+            <Marker
+              coordinate={{
+                latitude: location.latitude,
+                longitude: location.longitude,
+              }}
+              title="Din lokation"
+            />
+          )}
 
+          {cityMarkers.map((city) => (
+            <Marker
+              key={city.id}
+              coordinate={{
+                latitude: city.latitude,
+                longitude: city.longitude,
+              }}
+              title={city.name}
+            />
+          ))}
+        </MapView>
+      </View>
+
+      <View style={styles.cityList}>
         {cityMarkers.map((city) => (
-          <Marker
-            key={city.id}
-            coordinate={{
-              latitude: city.latitude,
-              longitude: city.longitude,
-            }}
-            title={city.name}
-          />
+          <View key={city.id} style={styles.cityChip}>
+            <Text style={styles.cityChipText}>{city.name}</Text>
+          </View>
         ))}
-      </MapView>
+      </View>
     </View>
   );
 }
@@ -78,16 +88,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 28,
     backgroundColor: '#eef6fb',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 34,
+    fontWeight: '800',
     color: '#123047',
-    marginBottom: 14,
+    marginBottom: 18,
+  },
+  mapCard: {
+    flex: 1,
+    overflow: 'hidden',
+    borderRadius: 24,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOpacity: 0.09,
+    shadowRadius: 8,
+    elevation: 4,
   },
   map: {
     flex: 1,
-    borderRadius: 14,
+  },
+  cityList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 16,
+  },
+  cityChip: {
+    backgroundColor: 'white',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+  },
+  cityChipText: {
+    color: '#123047',
+    fontWeight: '700',
   },
 });

@@ -1,28 +1,32 @@
 import { useState } from 'react';
 import {
-  Button,
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 
-function ChatMessage({ item }) {
+function SendButton({ onPress }) {
   return (
-    <View
-      style={[
-        styles.chatBubble,
-        item.sender === 'user' ? styles.userBubble : styles.aiBubble,
-      ]}
-    >
-      <Text style={styles.chatSender}>
-        {item.sender === 'user' ? 'Dig' : 'AI'}
-      </Text>
+    <Pressable style={styles.sendButton} onPress={onPress}>
+      <Text style={styles.sendButtonText}>Send</Text>
+    </Pressable>
+  );
+}
 
-      <Text style={styles.chatText}>{item.text}</Text>
+function ChatMessage({ item }) {
+  const isUser = item.sender === 'user';
+
+  return (
+    <View style={[styles.messageRow, isUser && styles.userMessageRow]}>
+      <View style={[styles.chatBubble, isUser ? styles.userBubble : styles.aiBubble]}>
+        <Text style={styles.chatSender}>{isUser ? 'Dig' : 'AI'}</Text>
+        <Text style={styles.chatText}>{item.text}</Text>
+      </View>
     </View>
   );
 }
@@ -150,28 +154,6 @@ function answerWeatherQuestion(question, weather) {
   }
 
   if (
-    lowerQuestion.includes('godt vejr') ||
-    lowerQuestion.includes('dårligt vejr') ||
-    lowerQuestion.includes('hvordan er vejret') ||
-    lowerQuestion.includes('vurder') ||
-    lowerQuestion.includes('anbefal')
-  ) {
-    if (!isRaining && isMild && !isWindy) {
-      return `Vejret ser generelt godt ud. ${temperature}°C, lav regn og vind på ${windSpeed} km/t gør det behageligt til de fleste udendørsaktiviteter.`;
-    }
-
-    if (isRaining && isWindy) {
-      return `Vejret virker lidt ustabilt. Der er både regn og en del vind, så det er ikke optimalt til udendørsaktiviteter.`;
-    }
-
-    if (isCold) {
-      return `Vejret er okay, men ret koldt med ${temperature}°C. Det kræver lidt varmere tøj.`;
-    }
-
-    return `Vejret er blandet. Temperaturen er ${temperature}°C, vinden er ${windSpeed} km/t, og regnen er ${rain} mm.`;
-  }
-
-  if (
     lowerQuestion.includes('regn') ||
     lowerQuestion.includes('paraply') ||
     lowerQuestion.includes('vådt') ||
@@ -213,7 +195,7 @@ function answerWeatherQuestion(question, weather) {
     return `Temperaturen er mild med ${temperature}°C. Det passer godt til mange udendørsaktiviteter.`;
   }
 
-  return `Ud fra de aktuelle vejrdata er temperaturen ${temperature}°C, vinden er ${windSpeed} km/t, og regnen er ${rain} mm. Spørg gerne mere specifikt, fx om løb, cykling, svømning, tøj, regn, vind eller gåtur.`;
+  return `Ud fra de aktuelle vejrdata er temperaturen ${temperature}°C, vinden er ${windSpeed} km/t, og regnen er ${rain} mm. Spørg gerne mere specifikt om løb, cykling, svømning, tøj, regn eller vind.`;
 }
 
 export default function ChatScreen({ route }) {
@@ -224,7 +206,7 @@ export default function ChatScreen({ route }) {
     {
       id: '1',
       sender: 'ai',
-      text: 'Hej! Spørg mig om vejret, fx om du kan løbe, svømme, cykle, tage på stranden eller hvilken jakke du skal tage på.',
+      text: 'Hej! Spørg mig om vejret, aktiviteter eller hvad du bør tage på.',
     },
   ]);
 
@@ -261,12 +243,7 @@ export default function ChatScreen({ route }) {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>AI-chat om vejret</Text>
-
-        <Text style={styles.description}>
-          Stil spørgsmål om aktiviteter, tøj, regn, vind eller om vejret passer
-          til dine planer.
-        </Text>
+        <Text style={styles.title}>AI-chat</Text>
 
         <FlatList
           data={messages}
@@ -286,7 +263,7 @@ export default function ChatScreen({ route }) {
             multiline
           />
 
-          <Button title="Send" onPress={sendChatMessage} />
+          <SendButton onPress={sendChatMessage} />
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -301,18 +278,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 26,
   },
   title: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 34,
+    fontWeight: '800',
     color: '#123047',
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 15,
-    color: '#4d6675',
-    lineHeight: 21,
-    marginBottom: 16,
+    marginBottom: 18,
   },
   messageList: {
     flex: 1,
@@ -320,38 +292,62 @@ const styles = StyleSheet.create({
   messageContent: {
     paddingBottom: 12,
   },
-  inputContainer: {
-    backgroundColor: '#eef6fb',
-    paddingTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccd7df',
-    borderRadius: 10,
-    padding: 12,
+  messageRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     marginBottom: 10,
-    backgroundColor: '#ffffff',
-    minHeight: 46,
-    maxHeight: 100,
+  },
+  userMessageRow: {
+    justifyContent: 'flex-end',
   },
   chatBubble: {
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 8,
+    maxWidth: '82%',
+    padding: 13,
+    borderRadius: 18,
   },
   userBubble: {
-    backgroundColor: '#d7ebff',
+    backgroundColor: '#1f7a9c',
+    borderBottomRightRadius: 4,
   },
   aiBubble: {
     backgroundColor: '#ffffff',
+    borderBottomLeftRadius: 4,
   },
   chatSender: {
-    fontWeight: 'bold',
+    fontWeight: '800',
     marginBottom: 4,
     color: '#123047',
   },
   chatText: {
     fontSize: 15,
     lineHeight: 21,
+    color: '#253946',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  input: {
+    flex: 1,
+    padding: 12,
+    maxHeight: 110,
+    fontSize: 15,
+  },
+  sendButton: {
+    backgroundColor: '#1f7a9c',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 15,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontWeight: '800',
   },
 });
