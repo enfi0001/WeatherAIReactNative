@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
 import ChatScreen from './screens/ChatScreen';
 import MapScreen from './screens/MapScreen';
+import CitySearchScreen from './screens/CitySearchScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +39,12 @@ export default function App() {
           name="Map"
           component={MapScreen}
           options={{ title: 'Vejrkort' }}
+        />
+
+        <Stack.Screen
+          name="CitySearch"
+          component={CitySearchScreen}
+          options={{ title: 'Søg by' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

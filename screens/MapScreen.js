@@ -40,11 +40,6 @@ export default function MapScreen({ route }) {
     <View style={styles.container}>
       <Text style={styles.title}>Vejrkort</Text>
 
-      <Text style={styles.description}>
-        Kortet viser din lokation og nogle eksempelbyer. Vi henter ikke vejrdata
-        for alle byer automatisk, så vi undgår for mange API-kald.
-      </Text>
-
       <MapView
         style={styles.map}
         initialRegion={{
@@ -61,7 +56,6 @@ export default function MapScreen({ route }) {
               longitude: location.longitude,
             }}
             title="Din lokation"
-            description="Her henter appen vejret fra"
           />
         )}
 
@@ -73,7 +67,6 @@ export default function MapScreen({ route }) {
               longitude: city.longitude,
             }}
             title={city.name}
-            description="Eksempel på by-marker"
           />
         ))}
       </MapView>
@@ -88,16 +81,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#eef6fb',
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#123047',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 15,
-    color: '#4d6675',
     marginBottom: 14,
-    lineHeight: 21,
   },
   map: {
     flex: 1,

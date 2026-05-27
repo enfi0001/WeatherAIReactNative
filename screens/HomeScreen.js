@@ -151,7 +151,7 @@ export default function HomeScreen({ navigation }) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
-        <Text style={styles.loadingText}>Henter lokation og vejr...</Text>
+        <Text style={styles.loadingText}>Henter vejr...</Text>
       </View>
     );
   }
@@ -167,11 +167,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Weather AI App</Text>
-
-      <Text style={styles.subtitle}>
-        Vejrbaseret anbefaling ud fra din lokation
-      </Text>
+      <Text style={styles.title}>Weather AI</Text>
 
       {weather && <WeatherCard weather={weather} />}
 
@@ -182,11 +178,11 @@ export default function HomeScreen({ navigation }) {
       <AnalysisList analysis={analysis} />
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Andre funktioner</Text>
+        <Text style={styles.cardTitle}>Menu</Text>
 
         <View style={styles.buttonSpacing}>
           <Button
-            title="Åbn AI-chat"
+            title="AI-chat"
             onPress={() =>
               navigation.navigate('Chat', {
                 weather,
@@ -195,8 +191,15 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
 
+        <View style={styles.buttonSpacing}>
+          <Button
+            title="Søg by"
+            onPress={() => navigation.navigate('CitySearch')}
+          />
+        </View>
+
         <Button
-          title="Åbn vejrkort"
+          title="Vejrkort"
           onPress={() =>
             navigation.navigate('Map', {
               location,
@@ -219,6 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#eef6fb',
   },
   loadingText: {
     marginTop: 12,
@@ -231,15 +235,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   title: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 6,
-    color: '#123047',
-  },
-  subtitle: {
-    fontSize: 16,
     marginBottom: 20,
-    color: '#4d6675',
+    color: '#123047',
   },
   card: {
     backgroundColor: 'white',
@@ -255,6 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12,
+    color: '#123047',
   },
   weatherText: {
     fontSize: 16,
